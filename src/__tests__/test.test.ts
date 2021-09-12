@@ -1,15 +1,37 @@
-import { Scanner, Token } from "../core/Scanner"
+import { Scanner, Token } from '../core/Scanner'
 
 describe('Scanner', () => {
   const createScanner = (code: string) => new Scanner(code)
+  const lexemes = (tokens: Token[]): string[] =>
+    tokens.map((token) => token.lexeme)
+
+  it('should parse single character lexemes', () => {
+    // const scanner = createScanner('(){},.-+;*')
+    const scanner = createScanner('(){},.-+;*')
+
+    const tokens: Token[] = scanner.scan()
+
+    expect(lexemes(tokens)).toEqual([
+      '(',
+      ')',
+      '{',
+      '}',
+      ',',
+      '.',
+      '-',
+      '+',
+      ';',
+      '*',
+      '',
+    ])
+  })
 
   it('should parse Lox statements', () => {
     const scanner = createScanner(COMPLEX_CODE)
 
     const tokens: Token[] = scanner.scan()
 
-    const lexemes: string[] = tokens.map((token) => token.lexeme)
-    expect(lexemes).toEqual(TOKENS)
+    expect(lexemes(tokens)).toEqual(TOKENS)
   })
 
   const COMPLEX_CODE = `
@@ -81,5 +103,6 @@ describe('Scanner', () => {
     ';',
     '}',
     '}',
+    '',
   ]
 })
