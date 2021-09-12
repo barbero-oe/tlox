@@ -18,16 +18,17 @@ export class Scanner {
     [';', TokenType.SEMICOLON],
     ['*', TokenType.STAR],
   ])
+  private readonly errors: ScanError[] = []
 
   constructor(private readonly source: string) {}
 
-  scan(): Token[] {
+  scan(): ScanResult {
     while (!this.isAtEnd()) {
       this.start = this.current
       this.scanToken()
     }
-    this.addToken(TokenType.EOF)
-    return this.tokens
+    this.tokens.push(new Token(TokenType.EOF, '', null, this.line))
+    return { tokens: this.tokens, errors: this.errors }
   }
 
   private scanToken() {
@@ -35,6 +36,8 @@ export class Scanner {
     const token = this.singleTokens.get(character)
     if (token !== undefined) {
       this.addToken(token)
+    } else {
+      this.error(this.line, 'Unexpected character.', character)
     }
   }
 
@@ -43,9 +46,27 @@ export class Scanner {
     this.tokens.push(new Token(type, text, literal, this.line))
   }
 
-  private isAtEnd = (): boolean => this.current > this.source.length
+  private isAtEnd = (): boolean => this.current >= this.source.length
 
   private advance(): string {
     return this.source[this.current++]
   }
+
+  private error(line: number, message: string, symbol: string) {
+    const error = new ScanError(line, message, symbol)
+    return this.errors.push(error)
+  }
+}
+
+export type ScanResult = {
+  tokens: Token[]
+  errors: ScanError[]
+}
+
+export class ScanError {
+  constructor(
+    readonly line: number,
+    readonly message: string,
+    readonly symbol: string
+  ) {}
 }

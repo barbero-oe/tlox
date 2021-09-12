@@ -1,16 +1,18 @@
-import { Scanner, Token } from '../core/Scanner'
+import { ScanError, Scanner } from '../core/Scanner'
+import { Token } from '../core/Token'
 
 describe('Scanner', () => {
   const createScanner = (code: string) => new Scanner(code)
-  const lexemes = (tokens: Token[]): string[] =>
-    tokens.map((token) => token.lexeme)
+  const lexemes = (tokens: Token[]) => tokens.map((token) => token.lexeme)
+  const symbols = (errors: ScanError[]) => errors.map((error) => error.symbol)
 
   it('should parse single character lexemes', () => {
     // const scanner = createScanner('(){},.-+;*')
     const scanner = createScanner('(){},.-+;*')
 
-    const tokens: Token[] = scanner.scan()
+    const { tokens, errors } = scanner.scan()
 
+    expect(errors).toBeEmpty()
     expect(lexemes(tokens)).toEqual([
       '(',
       ')',
@@ -22,15 +24,24 @@ describe('Scanner', () => {
       '+',
       ';',
       '*',
-      '',
+      ''
     ])
+  })
+
+  it('should show errors when it finds invalid characters', () => {
+    const scanner = createScanner('@#^')
+
+    const { errors } = scanner.scan()
+
+    expect(symbols(errors)).toEqual(['@', '#', '^'])
   })
 
   it('should parse Lox statements', () => {
     const scanner = createScanner(COMPLEX_CODE)
 
-    const tokens: Token[] = scanner.scan()
+    const { tokens, errors } = scanner.scan()
 
+    expect(symbols(errors)).toBeEmpty()
     expect(lexemes(tokens)).toEqual(TOKENS)
   })
 
