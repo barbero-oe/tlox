@@ -36,8 +36,19 @@ export class Scanner {
     const token = this.singleTokens.get(character)
     if (token !== undefined) {
       this.addToken(token)
-    } else {
-      this.error(this.line, 'Unexpected character.', character)
+      return
+    }
+    switch (character) {
+      case ' ':
+      case '\t':
+      case '\r':
+        break
+      case '\n':
+        this.line++
+        break
+      default:
+        this.error(this.line, 'Unexpected character.', character)
+        break
     }
   }
 
