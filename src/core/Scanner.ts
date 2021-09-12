@@ -46,6 +46,20 @@ export class Scanner {
       case '\n':
         this.line++
         break
+      case '<':
+        this.addToken(this.match('=') ? TokenType.LESS_EQUAL : TokenType.LESS)
+        break
+      case '>':
+        this.addToken(
+          this.match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER
+        )
+        break
+      case '!':
+        this.addToken(this.match('=') ? TokenType.BANG_EQUAL : TokenType.BANG)
+        break
+      case '=':
+        this.addToken(this.match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL)
+        break
       default:
         this.error(this.line, 'Unexpected character.', character)
         break
@@ -61,6 +75,13 @@ export class Scanner {
 
   private advance(): string {
     return this.source[this.current++]
+  }
+
+  private match(character: string): boolean {
+    if (this.isAtEnd()) return false
+    if (this.source[this.current] !== character) return false
+    this.current++
+    return true
   }
 
   private error(line: number, message: string, symbol: string) {

@@ -54,13 +54,23 @@ describe('Scanner', () => {
     expect(lines(errors)).toEqual([1, 2])
   })
 
-  // it('should handle multi-character lexemes', () => {
-  //   const scanner = createScanner('= == < <= < >= ! !=')
+  it('should handle multi-character lexemes', () => {
+    const scanner = createScanner('= == < <= > >= ! !=')
 
-  //   const { errors } = scanner.scan()
+    const { tokens } = scanner.scan()
 
-  //   expect(lines(errors)).toEqual([1, 2])
-  // })
+    expect(lexemes(tokens)).toEqual([
+      '=',
+      '==',
+      '<',
+      '<=',
+      '>',
+      '>=',
+      '!',
+      '!=',
+      '',
+    ])
+  })
 
   it('should parse Lox statements', () => {
     const scanner = createScanner(COMPLEX_CODE)
