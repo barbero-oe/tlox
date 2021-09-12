@@ -72,6 +72,33 @@ describe('Scanner', () => {
     ])
   })
 
+  it('should detect slash symbol', () => {
+    const scanner = createScanner('/')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(symbols(errors)).toBeEmpty()
+    expect(lexemes(tokens)).toEqual(['/', ''])
+  })
+
+  it('should detect single line comments', () => {
+    const scanner = createScanner('// a comment\n@')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toEqual([2])
+    expect(lexemes(tokens)).toEqual([''])
+  })
+
+  it('should detect single line at the end of file', () => {
+    const scanner = createScanner('// a comment')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(symbols(errors)).toBeEmpty()
+    expect(lexemes(tokens)).toEqual([''])
+  })
+
   it('should parse Lox statements', () => {
     const scanner = createScanner(COMPLEX_CODE)
 

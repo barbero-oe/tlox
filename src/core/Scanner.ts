@@ -60,6 +60,10 @@ export class Scanner {
       case '=':
         this.addToken(this.match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL)
         break
+      case '/':
+        if (this.match('/')) this.consumeComment()
+        else this.addToken(TokenType.SLASH)
+        break
       default:
         this.error(this.line, 'Unexpected character.', character)
         break
@@ -77,6 +81,10 @@ export class Scanner {
     return this.source[this.current++]
   }
 
+  private peek(): string {
+    return this.source[this.current]
+  }
+
   private match(character: string): boolean {
     if (this.isAtEnd()) return false
     if (this.source[this.current] !== character) return false
@@ -87,6 +95,10 @@ export class Scanner {
   private error(line: number, message: string, symbol: string) {
     const error = new ScanError(line, message, symbol)
     return this.errors.push(error)
+  }
+
+  private consumeComment() {
+    while (this.peek() !== '\n' && !this.isAtEnd()) this.advance()
   }
 }
 
