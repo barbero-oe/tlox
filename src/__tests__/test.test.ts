@@ -140,6 +140,16 @@ describe('Scanner', () => {
     expect(literals(tokens)).toEqual([null])
   })
 
+  it('should detect numbers', () => {
+    const scanner = createScanner('423\n23.33')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toBeEmpty()
+    expect(lexemes(tokens)).toEqual(['423', '23.33', ''])
+    expect(literals(tokens)).toEqual([423, 23.33, null])
+  })
+
   it('should parse Lox statements', () => {
     const scanner = createScanner(COMPLEX_CODE)
 

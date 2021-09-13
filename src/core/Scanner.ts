@@ -68,7 +68,8 @@ export class Scanner {
         this.consumeString()
         break
       default:
-        this.report(this.line, 'Unexpected character.', character)
+        if (this.isDigit(character)) this.consumeNumber()
+        else this.report(this.line, 'Unexpected character.', character)
         break
     }
   }
@@ -87,6 +88,11 @@ export class Scanner {
   private peek(): string {
     if (this.isAtEnd()) return '\0'
     return this.source.charAt(this.current)
+  }
+
+  private peekNext(): string {
+    if (this.current + 1 >= this.source.length) return '\0'
+    return this.source.charAt(this.current + 1)
   }
 
   private match(character: string): boolean {
@@ -118,6 +124,19 @@ export class Scanner {
     this.advance()
     const value = this.source.substring(this.start + 1, this.current - 1)
     this.addToken(TokenType.STRING, value)
+  }
+
+  private isDigit = (character: string) => character >= '0' && character <= '9'
+
+  private consumeNumber() {
+    while (this.isDigit(this.peek())) this.advance()
+    if (this.peek() === '.' && this.isDigit(this.peekNext())) {
+      this.advance()
+      while (this.isDigit(this.peek())) this.advance()
+    }
+    const value = this.source.substring(this.start, this.current)
+    const literal = parseFloat(value)
+    this.addToken(TokenType.NUMBER, literal)
   }
 }
 
