@@ -18,6 +18,24 @@ export class Scanner {
     [';', TokenType.SEMICOLON],
     ['*', TokenType.STAR],
   ])
+  private readonly reservedWords = new Map<string, TokenType>([
+    ['and', TokenType.AND],
+    ['class', TokenType.CLASS],
+    ['else', TokenType.ELSE],
+    ['false', TokenType.FALSE],
+    ['for', TokenType.FOR],
+    ['fun', TokenType.FUN],
+    ['if', TokenType.IF],
+    ['nil', TokenType.NIL],
+    ['or', TokenType.OR],
+    ['print', TokenType.PRINT],
+    ['return', TokenType.RETURN],
+    ['super', TokenType.SUPER],
+    ['this', TokenType.THIS],
+    ['true', TokenType.TRUE],
+    ['var', TokenType.VAR],
+    ['while', TokenType.WHILE],
+  ])
   private readonly errors: ScanError[] = []
 
   constructor(private readonly source: string) {}
@@ -69,9 +87,25 @@ export class Scanner {
         break
       default:
         if (this.isDigit(character)) this.consumeNumber()
+        else if (this.isAlpha(character)) this.consumeIdentifier()
         else this.report(this.line, 'Unexpected character.', character)
         break
     }
+  }
+
+  private isAlpha = (character: string): boolean =>
+    (character >= 'a' && character <= 'z') ||
+    (character >= 'A' && character <= 'Z') ||
+    character == '_'
+
+  private isAlphaNumeric = (character: string): boolean =>
+    this.isAlpha(character) || this.isDigit(character)
+
+  private consumeIdentifier() {
+    while (this.isAlphaNumeric(this.peek()) && !this.isAtEnd()) this.advance()
+    const text = this.source.substring(this.start, this.current)
+    const type = this.reservedWords.get(text)
+    this.addToken(type ? type : TokenType.IDENTIFIER)
   }
 
   private addToken(type: TokenType, literal: Literal = null) {

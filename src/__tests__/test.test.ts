@@ -1,10 +1,12 @@
 import { ScanError, Scanner } from '../core/Scanner'
 import { Token } from '../core/Token'
+import { TokenType } from '../core/TokenType'
 
 describe('Scanner', () => {
   const createScanner = (code: string) => new Scanner(code)
   const lexemes = (tokens: Token[]) => tokens.map((token) => token.lexeme)
   const literals = (tokens: Token[]) => tokens.map((token) => token.literal)
+  const types = (tokens: Token[]) => tokens.map((token) => token.type)
   const symbols = (errors: ScanError[]) => errors.map((error) => error.symbol)
   const lines = (errors: ScanError[]) => errors.map((error) => error.line)
   const messages = (errors: ScanError[]) => errors.map((error) => error.message)
@@ -148,6 +150,31 @@ describe('Scanner', () => {
     expect(lines(errors)).toBeEmpty()
     expect(lexemes(tokens)).toEqual(['423', '23.33', ''])
     expect(literals(tokens)).toEqual([423, 23.33, null])
+  })
+
+  it('should detect identifiers', () => {
+    const scanner = createScanner('hello world_4')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toBeEmpty()
+    expect(lexemes(tokens)).toEqual(['hello', 'world_4', ''])
+  })
+
+  it('should detect reserved identifiers', () => {
+    const scanner = createScanner('hello class if fun world')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toBeEmpty()
+    expect(types(tokens)).toEqual([
+      TokenType.IDENTIFIER,
+      TokenType.CLASS,
+      TokenType.IF,
+      TokenType.FUN,
+      TokenType.IDENTIFIER,
+      TokenType.EOF,
+    ])
   })
 
   it('should parse Lox statements', () => {
