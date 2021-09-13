@@ -4,11 +4,12 @@ import { Token } from '../core/Token'
 describe('Scanner', () => {
   const createScanner = (code: string) => new Scanner(code)
   const lexemes = (tokens: Token[]) => tokens.map((token) => token.lexeme)
+  const literals = (tokens: Token[]) => tokens.map((token) => token.literal)
   const symbols = (errors: ScanError[]) => errors.map((error) => error.symbol)
   const lines = (errors: ScanError[]) => errors.map((error) => error.line)
+  const messages = (errors: ScanError[]) => errors.map((error) => error.message)
 
   it('should parse single character lexemes', () => {
-    // const scanner = createScanner('(){},.-+;*')
     const scanner = createScanner('(){},.-+;*')
 
     const { tokens, errors } = scanner.scan()
@@ -90,13 +91,53 @@ describe('Scanner', () => {
     expect(lexemes(tokens)).toEqual([''])
   })
 
-  it('should detect single line at the end of file', () => {
+  it('should detect single line comment at the end of file', () => {
     const scanner = createScanner('// a comment')
 
     const { tokens, errors } = scanner.scan()
 
     expect(symbols(errors)).toBeEmpty()
     expect(lexemes(tokens)).toEqual([''])
+  })
+
+  it('should detect empty comment at the end of file', () => {
+    const scanner = createScanner('//')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(symbols(errors)).toBeEmpty()
+    expect(lexemes(tokens)).toEqual([''])
+  })
+
+  it('should detect strings', () => {
+    const scanner = createScanner('"a string"')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(symbols(errors)).toBeEmpty()
+    expect(lexemes(tokens)).toEqual(['"a string"', ''])
+    expect(literals(tokens)).toEqual(['a string', null])
+  })
+
+  it('should support multiline strings', () => {
+    const scanner = createScanner('"a\nstring"@')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toEqual([2])
+    expect(lexemes(tokens)).toEqual(['"a\nstring"', ''])
+    expect(literals(tokens)).toEqual(['a\nstring', null])
+  })
+
+  it('should detect unfinished strings', () => {
+    const scanner = createScanner('"an unfinished string')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toEqual([1])
+    expect(messages(errors)).toEqual(['Unterminated string.'])
+    expect(lexemes(tokens)).toEqual([''])
+    expect(literals(tokens)).toEqual([null])
   })
 
   it('should parse Lox statements', () => {
@@ -116,9 +157,10 @@ describe('Scanner', () => {
 
       serve(who) {
         print "Enjoy your breakfast, " + who + ".";
+        print 13.14;
 
         // single line comment
-        var outside = "outside";
+        var outside = 523;
 
         /*
         multi line comment
@@ -143,7 +185,7 @@ describe('Scanner', () => {
     ')',
     '{',
     'print',
-    "Eggs a-fryin'!",
+    '"Eggs a-fryin\'!"',
     ';',
     '}',
     'serve',
@@ -152,16 +194,19 @@ describe('Scanner', () => {
     ')',
     '{',
     'print',
-    'Enjoy your breakfast, ',
+    '"Enjoy your breakfast, "',
     '+',
     'who',
     '+',
-    '.',
+    '"."',
+    ';',
+    'print',
+    '13.14',
     ';',
     'var',
     'outside',
     '=',
-    'outside',
+    '523',
     ';',
     'fun',
     'inner',

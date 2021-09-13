@@ -64,8 +64,11 @@ export class Scanner {
         if (this.match('/')) this.consumeComment()
         else this.addToken(TokenType.SLASH)
         break
+      case '"':
+        this.consumeString()
+        break
       default:
-        this.error(this.line, 'Unexpected character.', character)
+        this.report(this.line, 'Unexpected character.', character)
         break
     }
   }
@@ -78,11 +81,12 @@ export class Scanner {
   private isAtEnd = (): boolean => this.current >= this.source.length
 
   private advance(): string {
-    return this.source[this.current++]
+    return this.source.charAt(this.current++)
   }
 
   private peek(): string {
-    return this.source[this.current]
+    if (this.isAtEnd()) return '\0'
+    return this.source.charAt(this.current)
   }
 
   private match(character: string): boolean {
@@ -92,13 +96,28 @@ export class Scanner {
     return true
   }
 
-  private error(line: number, message: string, symbol: string) {
+  private report(line: number, message: string, symbol: string) {
     const error = new ScanError(line, message, symbol)
     return this.errors.push(error)
   }
 
   private consumeComment() {
     while (this.peek() !== '\n' && !this.isAtEnd()) this.advance()
+  }
+
+  private consumeString() {
+    while (this.peek() !== '"' && !this.isAtEnd()) {
+      if (this.peek() === '\n') this.line++
+      this.advance()
+    }
+    if (this.isAtEnd()) {
+      const value = this.source.substring(this.start, this.current - 1)
+      this.report(this.line, 'Unterminated string.', value)
+      return
+    }
+    this.advance()
+    const value = this.source.substring(this.start + 1, this.current - 1)
+    this.addToken(TokenType.STRING, value)
   }
 }
 

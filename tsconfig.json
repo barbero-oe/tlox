@@ -1,6 +1,17 @@
 {
     "extends": "@tsconfig/recommended/tsconfig.json",
     "compilerOptions": {
-      "outDir": "build"
+      "outDir": "build",
+      "allowUnreachableCode": false,
+      "allowUnusedLabels": false,
+      "exactOptionalPropertyTypes": true,
+      "noFallthroughCasesInSwitch":false,
+      "noImplicitOverride": true,
+      "noImplicitReturns": true,
+      "noImplicitThis": true,
+      "noPropertyAccessFromIndexSignature": true,
+      "noUncheckedIndexedAccess": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
     }
 }

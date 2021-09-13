@@ -4,9 +4,9 @@ export type Literal = string | number | null
 
 export class Token {
   constructor(
-    private readonly type: TokenType,
-    public readonly lexeme: string,
-    private readonly literal: Literal,
-    private readonly line: number
+    readonly type: TokenType,
+    readonly lexeme: string,
+    readonly literal: Literal,
+    readonly line: number
   ) {}
 }
