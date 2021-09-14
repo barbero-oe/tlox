@@ -80,6 +80,7 @@ export class Scanner {
         break
       case '/':
         if (this.match('/')) this.consumeComment()
+        else if (this.match('*')) this.consumeMultilineComment()
         else this.addToken(TokenType.SLASH)
         break
       case '"':
@@ -143,6 +144,38 @@ export class Scanner {
 
   private consumeComment() {
     while (this.peek() !== '\n' && !this.isAtEnd()) this.advance()
+  }
+
+  private consumeMultilineComment() {
+    const closesComment = () => this.peek() === '*' && this.peekNext() === '/'
+    const opensComment = () => this.peek() === '/' && this.peekNext() === '*'
+    let nesting = 0
+    for (;;) {
+      this.advance()
+      while (
+        !this.isAtEnd() &&
+        this.peek() !== '\n' &&
+        !opensComment() &&
+        !closesComment()
+      ) {
+        this.advance()
+      }
+      if (this.isAtEnd()) {
+        const value = this.source.substring(this.start, this.current - 1)
+        this.report(this.line, 'Unterminated comment', value)
+        break
+      } else if (this.peek() === '\n') {
+        this.advance()
+        this.line++
+      } else if (opensComment()) nesting++
+      else if (closesComment()) {
+        nesting--
+        if (nesting >= 0) continue
+        this.advance()
+        this.advance()
+        break
+      }
+    }
   }
 
   private consumeString() {

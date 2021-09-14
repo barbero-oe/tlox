@@ -177,6 +177,33 @@ describe('Scanner', () => {
     ])
   })
 
+  it('should ignore multiline comments', () => {
+    const scanner = createScanner('/* many ** comments\nwith lines */@')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toEqual([2])
+    expect(types(tokens)).toEqual([TokenType.EOF])
+  })
+
+  it('should notify incomplete multiline comments', () => {
+    const scanner = createScanner('/* many ** comments\nwith lines')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toEqual([2])
+    expect(types(tokens)).toEqual([TokenType.EOF])
+  })
+
+  it('should support nested comments', () => {
+    const scanner = createScanner('if /* some /* nested */ comments*/ else')
+
+    const { tokens, errors } = scanner.scan()
+
+    expect(lines(errors)).toBeEmpty()
+    expect(types(tokens)).toEqual([TokenType.IF, TokenType.ELSE, TokenType.EOF])
+  })
+
   it('should parse Lox statements', () => {
     const scanner = createScanner(COMPLEX_CODE)
 
