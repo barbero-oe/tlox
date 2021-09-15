@@ -1,5 +1,5 @@
 import { TokenType } from './TokenType'
-import { Token, Literal } from './Token'
+import { LiteralValue, Token } from './Token'
 
 export class Scanner {
   private line = 1
@@ -109,7 +109,7 @@ export class Scanner {
     this.addToken(type ? type : TokenType.IDENTIFIER)
   }
 
-  private addToken(type: TokenType, literal: Literal = null) {
+  private addToken(type: TokenType, literal: LiteralValue = null) {
     const text = this.source.substring(this.start, this.current)
     this.tokens.push(new Token(type, text, literal, this.line))
   }

@@ -8,6 +8,7 @@
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --write ./src",
     "test": "jest",
+    "watch": "jest --watch",
     "build": "rm -rf build/* && tsc"
   },
   "devDependencies": {
