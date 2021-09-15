@@ -21,7 +21,7 @@ describe('PrinterVisitor should', () => {
       plus(mul(lit(3), lit(4)), minus(lit('hello world'))),
       '(+ (* 3 4) (- hello world))',
     ],
-    [group(mul(lit(3), lit(4))), '(group (* 3 4))'],
+    [group(mul(lit(3), minus(lit(4)))), '(group (* 3 (- 4)))'],
   ])('print an expression', (expr: Expr, expected: string) => {
     const visitor = new PrinterVisitor()
 

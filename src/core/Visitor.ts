@@ -1,4 +1,4 @@
-import { Binary, Grouping, Literal, Unary } from './Expr'
+import { Binary, Expr, Grouping, Literal, Unary } from './Expr'
 
 export interface Visitor<T> {
   visitUnary(expr: Unary): T
@@ -8,25 +8,19 @@ export interface Visitor<T> {
 }
 
 export class PrinterVisitor implements Visitor<string> {
-  visitUnary(expr: Unary): string {
-    const operator = expr.operator.lexeme
-    const right = expr.right.accept(this)
-    return `(${operator} ${right})`
-  }
+  visitUnary = (expr: Unary): string =>
+    this.parenthesize(expr.operator.lexeme, expr.right)
 
-  visitLiteral(expr: Literal): string {
-    return expr.value?.toString() ?? 'nil'
-  }
+  visitLiteral = (expr: Literal): string => expr.value?.toString() ?? 'nil'
 
-  visitGrouping(expr: Grouping): string {
-    const group = expr.expression.accept(this)
-    return `(group ${group})`
-  }
+  visitGrouping = (expr: Grouping): string =>
+    this.parenthesize('group', expr.expression)
 
-  visitBinary(expr: Binary): string {
-    const left = expr.left.accept(this)
-    const operator = expr.operator.lexeme
-    const right = expr.right.accept(this)
-    return `(${operator} ${left} ${right})`
+  visitBinary = (expr: Binary): string =>
+    this.parenthesize(expr.operator.lexeme, expr.left, expr.right)
+
+  private parenthesize(name: string, ...exprs: Expr[]): string {
+    const args = exprs.map((expr) => expr.accept(this)).join(' ')
+    return `(${name} ${args})`
   }
 }
