@@ -16,11 +16,11 @@ export class Parser {
   }
 
   private binary(): Expr {
-    const left = this.unary()
-    if (this.match(TokenType.PLUS)) {
+    let left = this.unary()
+    while (this.match(TokenType.PLUS, TokenType.STAR)) {
       const operator = this.previous()
       const right = this.unary()
-      return new Binary(left, operator, right)
+      left = new Binary(left, operator, right)
     }
     return left
   }
