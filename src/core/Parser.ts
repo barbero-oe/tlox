@@ -12,12 +12,22 @@ export class Parser {
   }
 
   private expression(): Expr {
-    return this.binary()
+    return this.term()
   }
 
-  private binary(): Expr {
+  private term(): Expr {
+    let left = this.factor()
+    while (this.match(TokenType.PLUS)) {
+      const operator = this.previous()
+      const right = this.factor()
+      left = new Binary(left, operator, right)
+    }
+    return left
+  }
+
+  private factor(): Expr {
     let left = this.unary()
-    while (this.match(TokenType.PLUS, TokenType.STAR)) {
+    while (this.match(TokenType.STAR, TokenType.SLASH)) {
       const operator = this.previous()
       const right = this.unary()
       left = new Binary(left, operator, right)

@@ -34,7 +34,10 @@ describe('Parser should', () => {
     ['-5', '(- 5)'],
     ['1 + 2', '(+ 1 2)'],
     ['1 * 2', '(* 1 2)'],
+    ['1 / 2', '(/ 1 2)'],
     ['1 + 2 + 3', '(+ (+ 1 2) 3)'],
+    ['1 + 2 * 3', '(+ 1 (* 2 3))'],
+    ['1 * 2 + 3', '(+ (* 1 2) 3)'],
   ])('parse expression %s => %s', (code: string, expected?: string) => {
     const representation = parse(code)
 
