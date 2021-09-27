@@ -1,3 +1,8 @@
+import { Expr } from '../core/Expr'
+import { Parser } from '../core/Parser'
+import { Scanner } from '../core/Scanner'
+import { PrinterVisitor } from '../core/Visitor'
+
 /*
 expression     → equality ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -9,11 +14,6 @@ unary          → ( "!" | "-" ) unary
 primary        → NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")" ;
 */
-
-import { Expr } from '../core/Expr'
-import { Parser } from '../core/Parser'
-import { Scanner } from '../core/Scanner'
-import { PrinterVisitor } from '../core/Visitor'
 
 describe('Parser should', () => {
   function parse(code: string): string {
@@ -48,6 +48,7 @@ describe('Parser should', () => {
     ['4 >= 3 <= 2', '(<= (>= 4 3) 2)'],
     ['4 + 3 >= 3 * 2', '(>= (+ 4 3) (* 3 2))'],
     ['4 >= 2 == !true != 3 > 2', '(!= (== (>= 4 2) (! true)) (> 3 2))'],
+    ['(1 + 2) * 3', '(* (group (+ 1 2)) 3)'],
   ])('parse expression [%s] -> [%s]', (code: string, expected?: string) => {
     const representation = parse(code)
 

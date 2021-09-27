@@ -1,4 +1,4 @@
-import { Binary, Expr, Literal, Unary } from './Expr'
+import { Binary, Expr, Grouping, Literal, Unary } from './Expr'
 import { Token } from './Token'
 import { TokenType } from './TokenType'
 
@@ -82,7 +82,16 @@ export class Parser {
     ) {
       return new Literal(this.previous().literal)
     }
+    if (this.match(TokenType.LEFT_PAREN)) {
+      const expr = this.expression()
+      this.consume(TokenType.RIGHT_PAREN, "Expected ')' after expression")
+      return new Grouping(expr)
+    }
     throw new Error("you shouldn't be here")
+  }
+
+  private consume(token: TokenType, message: string) {
+    if (!this.match(token)) throw new Error(message)
   }
 
   private match(...args: TokenType[]): boolean {
