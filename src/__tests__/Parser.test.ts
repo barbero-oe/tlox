@@ -45,7 +45,9 @@ describe('Parser should', () => {
     ['4 > 3', '(> 4 3)'],
     ['4 <= 3', '(<= 4 3)'],
     ['4 >= 3', '(>= 4 3)'],
+    ['4 >= 3 <= 2', '(<= (>= 4 3) 2)'],
     ['4 + 3 >= 3 * 2', '(>= (+ 4 3) (* 3 2))'],
+    ['4 >= 2 == !true != 3 > 2', '(!= (== (>= 4 2) (! true)) (> 3 2))'],
   ])('parse expression [%s] -> [%s]', (code: string, expected?: string) => {
     const representation = parse(code)
 
