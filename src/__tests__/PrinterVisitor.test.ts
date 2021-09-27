@@ -15,6 +15,7 @@ describe('PrinterVisitor should', () => {
 
   it.each([
     [minus(lit(5)), '(- 5)'],
+    [lit(true), 'true'],
     [minus(lit(null)), '(- nil)'],
     [mul(lit(3), lit(4)), '(* 3 4)'],
     [

@@ -10,10 +10,10 @@ primary        → NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")" ;
 */
 
-import { Expr } from "../core/Expr"
-import { Parser } from "../core/Parser"
-import { Scanner } from "../core/Scanner"
-import { PrinterVisitor } from "../core/Visitor"
+import { Expr } from '../core/Expr'
+import { Parser } from '../core/Parser'
+import { Scanner } from '../core/Scanner'
+import { PrinterVisitor } from '../core/Visitor'
 
 describe('Parser should', () => {
   function parse(code: string): string {
@@ -25,9 +25,7 @@ describe('Parser should', () => {
     return expression.accept(printer)
   }
 
-  it.each([
-    ['1']
-  ])('parse expression', (code: string) => {
+  it.each([['1'], ['true'], ['false']])('parse expression', (code: string) => {
     const representation = parse(code)
 
     expect(representation).toEqual(code)
