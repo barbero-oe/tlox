@@ -1,4 +1,4 @@
-import { Expr, Literal } from './Expr'
+import { Expr, Literal, Unary } from './Expr'
 import { Token } from './Token'
 import { TokenType } from './TokenType'
 
@@ -8,6 +8,15 @@ export class Parser {
   constructor(private tokens: Token[]) {}
 
   parse(): Expr {
+    return this.unary()
+  }
+
+  private unary(): Expr {
+    if (this.match(TokenType.BANG, TokenType.MINUS)) {
+      const operator = this.previous()
+      const right = this.unary()
+      return new Unary(operator, right)
+    }
     return this.primary()
   }
 

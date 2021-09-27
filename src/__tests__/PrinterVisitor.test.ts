@@ -12,10 +12,13 @@ describe('PrinterVisitor should', () => {
     new Binary(left, new Token(TokenType.PLUS, '+', null, 1), right)
   const lit = (lit: LiteralValue) => new Literal(lit)
   const group = (expr: Expr) => new Grouping(expr)
+  const bang = (expr: Expr) =>
+    new Unary(new Token(TokenType.BANG, '!', null, 1), expr)
 
   it.each([
     [minus(lit(5)), '(- 5)'],
     [lit(true), 'true'],
+    [bang(lit(true)), '(! true)'],
     [minus(lit(null)), '(- nil)'],
     [mul(lit(3), lit(4)), '(* 3 4)'],
     [

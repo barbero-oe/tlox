@@ -25,9 +25,16 @@ describe('Parser should', () => {
     return expression.accept(printer)
   }
 
-  it.each([['1'], ['true'], ['false']])('parse expression', (code: string) => {
+  it.each([
+    ['1', '1'],
+    ['true', 'true'],
+    ['false', 'false'],
+    ['nil', 'nil'],
+    ['!true', '(! true)'],
+    ['-5', '(- 5)'],
+  ])('parse expression', (code: string, expected?: string) => {
     const representation = parse(code)
 
-    expect(representation).toEqual(code)
+    expect(representation).toEqual(expected)
   })
 })
