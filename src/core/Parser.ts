@@ -17,7 +17,7 @@ export class Parser {
 
   private term(): Expr {
     let left = this.factor()
-    while (this.match(TokenType.PLUS)) {
+    while (this.match(TokenType.PLUS, TokenType.MINUS)) {
       const operator = this.previous()
       const right = this.factor()
       left = new Binary(left, operator, right)
