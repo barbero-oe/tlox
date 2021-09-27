@@ -12,7 +12,24 @@ export class Parser {
   }
 
   private expression(): Expr {
-    return this.term()
+    return this.comparison()
+  }
+
+  private comparison(): Expr {
+    let left = this.term()
+    while (
+      this.match(
+        TokenType.LESS,
+        TokenType.GREATER,
+        TokenType.LESS_EQUAL,
+        TokenType.GREATER_EQUAL
+      )
+    ) {
+      const operator = this.previous()
+      const right = this.factor()
+      left = new Binary(left, operator, right)
+    }
+    return left
   }
 
   private term(): Expr {
