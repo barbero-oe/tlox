@@ -1,4 +1,4 @@
-import { Expr, Literal, Unary } from './Expr'
+import { Binary, Expr, Literal, Unary } from './Expr'
 import { Token } from './Token'
 import { TokenType } from './TokenType'
 
@@ -8,7 +8,21 @@ export class Parser {
   constructor(private tokens: Token[]) {}
 
   parse(): Expr {
-    return this.unary()
+    return this.expression()
+  }
+
+  private expression(): Expr {
+    return this.binary()
+  }
+
+  private binary(): Expr {
+    const left = this.unary()
+    if (this.match(TokenType.PLUS)) {
+      const operator = this.previous()
+      const right = this.unary()
+      return new Binary(left, operator, right)
+    }
+    return left
   }
 
   private unary(): Expr {
@@ -21,9 +35,17 @@ export class Parser {
   }
 
   private primary(): Expr {
-    if (this.match(TokenType.TRUE, TokenType.FALSE))
+    if (
+      this.match(
+        TokenType.TRUE,
+        TokenType.FALSE,
+        TokenType.NUMBER,
+        TokenType.NIL
+      )
+    ) {
       return new Literal(this.previous().literal)
-    return new Literal(this.peek().literal)
+    }
+    throw new Error("you shouldn't be here")
   }
 
   private match(...args: TokenType[]): boolean {

@@ -32,7 +32,8 @@ describe('Parser should', () => {
     ['nil', 'nil'],
     ['!true', '(! true)'],
     ['-5', '(- 5)'],
-  ])('parse expression', (code: string, expected?: string) => {
+    ['1 + 2', '(+ 1 2)'],
+  ])('parse expression %s => %s', (code: string, expected?: string) => {
     const representation = parse(code)
 
     expect(representation).toEqual(expected)
