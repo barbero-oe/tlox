@@ -106,7 +106,10 @@ export class Scanner {
     while (this.isAlphaNumeric(this.peek()) && !this.isAtEnd()) this.advance()
     const text = this.source.substring(this.start, this.current)
     const type = this.reservedWords.get(text)
-    this.addToken(type ? type : TokenType.IDENTIFIER)
+    if (!type) this.addToken(TokenType.IDENTIFIER)
+    else if ([TokenType.TRUE, TokenType.FALSE].includes(type))
+      this.addToken(type, type === TokenType.TRUE)
+    else this.addToken(type)
   }
 
   private addToken(type: TokenType, literal: LiteralValue = null) {

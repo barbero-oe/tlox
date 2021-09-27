@@ -12,8 +12,8 @@ export class Parser {
   }
 
   private primary(): Expr {
-    if (this.match(TokenType.TRUE)) return new Literal(true)
-    if (this.match(TokenType.FALSE)) return new Literal(false)
+    if (this.match(TokenType.TRUE, TokenType.FALSE))
+      return new Literal(this.previous().literal)
     return new Literal(this.peek().literal)
   }
 
@@ -25,11 +25,22 @@ export class Parser {
     return false
   }
 
-  private advance = () => this.current++
+  private advance() {
+    this.current++
+  }
 
-  private peek(): Token {
-    const token = this.tokens[this.current]
-    if (!token) throw new Error('end')
-    return token
+  private peek = (): Token =>
+    this.assertNotNull(this.tokens[this.current], 'you are out of bound')
+
+  private previous = (): Token =>
+    this.assertNotNull(
+      this.tokens[this.current - 1],
+      'you are at least two steps out of bound'
+    )
+
+  private assertNotNull<T>(value: T | null | undefined, error: string): T {
+    if (value === null || value === undefined)
+      throw new Error(`AssertionError: ${error}`)
+    return value
   }
 }
